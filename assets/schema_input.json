@@ -7,34 +7,27 @@
     "items": {
         "type": "object",
         "properties": {
-            "udi": {
+            "sample": {
                 "type": "string",
                 "pattern": "^\\S+$",
-                "errorMessage": "UDI name must be provided and cannot contain spaces",
+                "errorMessage": "Sample name must be provided and cannot contain spaces",
                 "meta": ["id"]
             },
-            "fastq_1": {
+            "udi": {
                 "type": "string",
-                "format": "file-path",
                 "exists": true,
-                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 1 must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+                "pattern": "^\\S+$",
+                "errorMessage": "UDI must be provided and cannot contain spaces",
+                "meta": ["udi"]
             },
-            "fastq_2": {
-                "type": "string",
-                "format": "file-path",
-                "exists": true,
-                "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.f(ast)?q\\.gz$",
-                "errorMessage": "FastQ file for reads 2 cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
-            },
-            "barcodes": {
+            "barcode": {
                   "type": "string",
-                  "format": "file-path",
                   "exists": true,
-                  "pattern": "^([\\S\\s]*\\/)?[^\\s\\/]+\\.tsv$",
-                  "errorMessage": "Barcodes file cannot contain spaces and must have extension '.tsv', with header columns 'sample_id' and 'barcode'"
+                  "pattern": "^[ACTGN]+$",
+                  "errorMessage": "Barcode must be provided and can only contain A, C, T, G, N characters"
             }
         },
-        "required": ["udi", "fastq_1", "fastq_2", "barcodes"]
+        "required": ["sample", "udi", "barcode"],
+        "additionalProperties": true
     }
 }

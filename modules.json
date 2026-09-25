@@ -5,6 +5,11 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "bclconvert": {
+                        "branch": "master",
+                        "git_sha": "8b798ea24b2d639ef4d204add9ddb35dc0d8279f",
+                        "installed_by": ["modules"]
+                    },
                     "fastqc": {
                         "branch": "master",
                         "git_sha": "79b36b51048048374b642289bfe9e591ef56fe05",

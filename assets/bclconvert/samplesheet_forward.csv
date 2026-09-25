@@ -1,5 +1,6 @@
 [Header]
 FileFormatVersion,2
+IndexOrientation,Forward
 
 [BCLConvert_Settings]
 NoLaneSplitting,true
