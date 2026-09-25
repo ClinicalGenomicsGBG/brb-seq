@@ -10,7 +10,7 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input"],
+            "required": ["input", "outdir", "rundir"],
             "properties": {
                 "input": {
                     "type": "string",
@@ -22,6 +22,12 @@
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
                     "help_text": "The sample sheet should be a CSV file with the following columns: `sample`, `barcode`, `udi`.",
                     "fa_icon": "fas fa-file-csv"
+                },
+                "outdir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Directory where all output files will be saved.",
+                    "fa_icon": "fas fa-folder-open"
                 },
                 "rundir": {
                     "type": "string",
@@ -36,7 +42,7 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to the BCL Convert sample sheet.",
-                    "help_text": "The default sample sheet for BRB-seq experiments is shipped with this pipeline",
+                    "help_text": "The default sample sheets for BRB-seq experiments are shipped with this pipeline, one with index 2 in forward orientation (default) and one with reverse complimented index 2.",
                     "fa_icon": "fas fa-file-csv",
                     "hidden": true,
                     "default": "${projectDir}/assets/bclconvert/samplesheet_forward.csv"
