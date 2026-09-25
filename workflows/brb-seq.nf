@@ -3,7 +3,6 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { BARCODESWHITELIST      } from '../modules/local/barcodeswhitelist/main'
 include { BCLCONVERT             } from '../modules/nf-core/bclconvert/main'
 include { CONVERTMATRIX          } from '../modules/local/convertmatrix/main'
 include { FASTQC                 } from '../modules/nf-core/fastqc/main'
@@ -30,9 +29,9 @@ workflow BRB_SEQ {
     take:
     ch_samplesheet            // channel: samplesheet read in from --input
     ch_bclconvert_samplesheet // channel: samplesheet read in from --bclconvert_samplesheet (optional)
-    ch_rundir                 // channel: run directory path from --rundir
     ch_fasta                  // channel: FASTA file path from --fasta
     ch_gtf                    // channel: GTF file path from --gtf
+    ch_rundir                 // channel: run directory path from --rundir
     ch_star_index             // channel: pre-built STAR index directory from --star_index (optional)
     unzip_fasta               // boolean parameter: whether to unzip FASTA file (if gzipped) for STAR genome generation
     unzip_gtf                 // boolean parameter: whether to unzip GTF file (if gzipped) for STAR genome generation
