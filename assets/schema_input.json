@@ -9,20 +9,17 @@
         "properties": {
             "sample": {
                 "type": "string",
-                "pattern": "^\\S+$",
                 "errorMessage": "Sample name must be provided and cannot contain spaces",
                 "meta": ["id"]
             },
             "udi": {
                 "type": "string",
-                "exists": true,
                 "pattern": "^\\S+$",
                 "errorMessage": "UDI must be provided and cannot contain spaces",
                 "meta": ["udi"]
             },
             "barcode": {
                   "type": "string",
-                  "exists": true,
                   "pattern": "^[ACTGN]+$",
                   "errorMessage": "Barcode must be provided and can only contain A, C, T, G, N characters"
             }
