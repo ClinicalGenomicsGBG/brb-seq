@@ -4,6 +4,8 @@
 
 **ClinicalGenomicsGBG/brb-seq** is a bioinformatics pipeline that preprocesses raw sequencing data from BRB-seq and computes count matrices.
 
+![ClinicalGenomicsGBG/brb-seq metro map](docs/images/brb-seq_metro_map.svg)
+
 ## Usage
 
 > [!NOTE]
