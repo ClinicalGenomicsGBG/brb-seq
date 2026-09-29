@@ -39,13 +39,13 @@ The sequencing run supplied with `--rundir` is converted with BCL Convert using 
 <summary>Output files</summary>
 
 - `fastq/<udi>/`
-  - `<sample_id>.R1.fq.gz`, `<sample_id>.R2.fq.gz`: demultiplexed FASTQ files for each `sample_id` listed in the input CSV.
+  - `<sample>.R1.fq.gz`, `<sample>.R2.fq.gz`: demultiplexed FASTQ files for each `sample` listed in the input CSV.
   - `unmatched_R1.fq.gz`, `unmatched_R2.fq.gz`: reads whose BRB-seq barcode did not match any `barcode` in the input CSV.
   - `demux-metrics.txt`: per-barcode demultiplexing metrics.
 
 </details>
 
-The converted reads contain multiple biological samples multiplexed together via BRB-seq barcodes. [fqtk](https://github.com/fulcrumgenomics/fqtk) demultiplexes these into per-sample FASTQ files using the `sample_id`/`barcode` mappings from the input CSV for QC and archival purposes. STARsolo aligns and quantifies the converted pooled FASTQ files directly.
+The converted reads contain multiple biological samples multiplexed together via BRB-seq barcodes. [fqtk](https://github.com/fulcrumgenomics/fqtk) demultiplexes these into per-sample FASTQ files using the `sample`/`barcode` mappings from the input CSV for QC and archival purposes. STARsolo aligns and quantifies the converted pooled FASTQ files directly.
 
 ### STARsolo
 
@@ -66,8 +66,8 @@ The converted reads contain multiple biological samples multiplexed together via
 <summary>Output files</summary>
 
 - `umi_counts/`
-  - `<udi>.umi_counts.tsv`: gene x sample UMI count matrix, with columns labelled by `sample_id`.
-  - `<udi>.read_counts.tsv`: gene x sample read count matrix, with columns labelled by `sample_id`.
+  - `<udi>.umi_counts.tsv`: gene x sample UMI count matrix, with columns labelled by `sample`.
+  - `<udi>.read_counts.tsv`: gene x sample read count matrix, with columns labelled by `sample`.
 
 </details>
 

@@ -16,14 +16,14 @@ This pipeline demultiplexes a BRB-seq sequencing run with BCL Convert, then perf
 `samplesheet.csv`:
 
 ```csv
-sample_id,udi,barcode
+sample,udi,barcode
 SAMPLE_A,MQ-UDI-1,AAACCCAAGAAACACT
 SAMPLE_B,MQ-UDI-1,AAACCCAAGAAACCAT
 ```
 
 The three columns are mandatory and must be provided in this order:
 
-- `sample_id`: biological sample name used in the count matrices and demultiplexed FASTQ filenames
+- `sample`: biological sample name used in the count matrices and demultiplexed FASTQ filenames
 - `udi`: unique dual index name matching the sample sheet used for the sequencing run
 - `barcode`: BRB-seq barcode for the biological sample
 

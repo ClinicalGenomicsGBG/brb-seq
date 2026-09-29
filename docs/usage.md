@@ -8,7 +8,7 @@ ClinicalGenomicsGBG/brb-seq processess sequencing data generated using [Alithea'
 
 ## Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It must be a comma-separated file with exactly 3 columns, in this order: `sample_id`, `udi`, and `barcode`.
+You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It must be a comma-separated file with exactly 3 columns, in this order: `sample`, `udi`, and `barcode`.
 
 ```bash
 --input '[path to samplesheet file]'
@@ -21,7 +21,7 @@ Each row maps a biological sample to its UDI and BRB-seq barcode. FASTQ files ar
 A samplesheet may look like the one below:
 
 ```csv title="samplesheet.csv"
-sample_id,udi,barcode
+sample,udi,barcode
 SAMPLE_A,MQ-UDI-1,AAACCCAAGAAACACT
 SAMPLE_B,MQ-UDI-1,AAACCCAAGAAACCAT
 SAMPLE_C,MQ-UDI-1,AAACCCAAGAAACCCA
@@ -29,7 +29,7 @@ SAMPLE_C,MQ-UDI-1,AAACCCAAGAAACCCA
 
 | Column      | Description                                                                                                                                                                            |
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample_id` | Biological sample name used in demultiplexed FASTQ filenames and count-matrix column names.                                                                                             |
+| `sample` | Biological sample name used in demultiplexed FASTQ filenames and count-matrix column names.                                                                                             |
 | `udi`       | Unique Dual Index name matching the sequencing run's BCL Convert sample sheet.                                                                                                         |
 | `barcode`   | BRB-seq barcode associated with the biological sample.                                                                                                                                 |
 
