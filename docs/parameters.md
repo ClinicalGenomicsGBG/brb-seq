@@ -8,7 +8,10 @@ Define where the pipeline should find input data and save output data.
 
 | Parameter | Description | Type | Default | Required | Hidden |
 |-----------|-----------|-----------|-----------|-----------|-----------|
-| `input` | Path to comma-separated file containing information about the samples in the experiment. <details><summary>Help</summary><small>You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.</small></details>| `string` |  | True |  |
+| `input` | Path to comma-separated file containing information about the samples in the experiment. <details><summary>Help</summary><small>The sample sheet should be a CSV file with the following columns: `sample`, `barcode`, `udi`.</small></details>| `string` |  | True |  |
+| `outdir` | Directory where all output files will be saved. | `string` |  | True |  |
+| `rundir` | Directory of the sequencing run results to be demultiplexed | `string` |  | True |  |
+| `bclconvert_samplesheet` | Path to the BCL Convert sample sheet. <details><summary>Help</summary><small>The default sample sheets for BRB-seq experiments are shipped with this pipeline, one with index 2 in forward orientation (default) and one with reverse complimented index 2.</small></details>| `string` | ${projectDir}/assets/bclconvert/samplesheet_forward.csv |  | True |
 | `email` | Email address for completion summary. <details><summary>Help</summary><small>Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.</small></details>| `string` |  |  |  |
 | `multiqc_title` | MultiQC report title. Printed as page header, used for filename if not otherwise specified. | `string` |  |  |  |
 

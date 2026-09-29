@@ -1,0 +1,63 @@
+%%metro title: ClinicalGenomicsGBG/brb-seq
+%%metro style: nfcore
+%%metro mode: light
+%%metro legend: bl
+%%metro line: main | BRB-seq preprocessing | #4daf4a
+%%metro line: indexing | Optional | #4daf4a | dashed
+%%metro line: qc | QC Data | #377eb8
+%%metro dir: rundir_file | BCL
+%%metro file: fasta_file | FASTA | Reference genome
+%%metro file: gtf_file | GTF | Reference annotation
+%%metro files: fqtk_out | FASTQ
+%%metro file: umi_counts_out | TSV | UMI Counts
+%%metro file: readcounts_out | TSV | Read Counts
+%%metro file: multiqc_out | HTML | QC Report
+
+
+graph LR
+    subgraph indexing[STAR genome indexing]
+        %%metro direction: tb
+        fasta_file[ ]
+        gtf_file[ ]
+        star_genomegenerate[STAR\ngenomeGenerate]
+        fasta_file -->|indexing| star_genomegenerate
+        gtf_file -->|indexing| star_genomegenerate
+    end
+
+    subgraph bclconvert[UDI Demuxing]
+        rundir_file[ ]
+        bclconvert[BCLConvert]
+        fastqc[FastQC]
+        rundir_file -->|main| bclconvert
+        bclconvert -->|main| fastqc
+    end
+
+    subgraph main[Alignment]
+        starsolo[STARsolo]
+        readcounts_out[ ]
+        umi_counts_out[ ]
+
+        starsolo -->|main| umi_counts_out
+        starsolo -->|main| readcounts_out
+
+    end
+
+    subgraph demux[Sample Demuxing]
+        fqtk[FQTK]
+        fqtk_out[ ]
+        fqtk -->|main| fqtk_out
+    end
+
+    subgraph qc[QC Reporting]
+        multiqc[MultiQC]
+        multiqc_out[ ]
+
+        fastqc -->|qc| multiqc
+        multiqc -->|qc| multiqc_out
+    end
+
+    bclconvert -->|main| starsolo
+    star_genomegenerate -->|indexing| starsolo
+    bclconvert -->|main| fqtk
+    fqtk -->|qc| multiqc
+    starsolo -->|qc| multiqc

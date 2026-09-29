@@ -4,29 +4,30 @@
 
 This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
 
-The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
-
-<!-- TODO nf-core: Write this documentation describing your workflow's output -->
+The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory. FastQC and BCL Convert reports are collected into `multiqc/` rather than published as separate directories.
 
 ## Pipeline overview
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
-- [FastQC](#fastqc) - Raw read QC
+- [BCL Convert](#bcl-convert) - Conversion of the sequencing run to demultiplexed FASTQ files
+- [FastQC](#fastqc) - Raw read QC, included in MultiQC
 - [FQTK](#fqtk) - Demultiplexing of pooled BRB-seq FASTQ files
 - [STARsolo](#starsolo) - Genome index generation, alignment and per-cell/barcode quantification
-- [CONVERTMATRIX](#convertmatrix) - Per-sample UMI/read count matrix, with columns labelled by sample name
+- [CONVERTMATRIX](#convertmatrix) - Per-sample UMI and read count matrices
 - [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline
 - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
+
+### BCL Convert
+
+The sequencing run supplied with `--rundir` is converted with BCL Convert using the sample sheet supplied with `--bclconvert_samplesheet` (the forward-orientation sample sheet is used by default). Its reports and logs contribute to the MultiQC report.
 
 ### FastQC
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `fastqc/`
-  - `*_fastqc.html`: FastQC report containing quality metrics.
-  - `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
+- FastQC results are included in the MultiQC report under `multiqc/`.
 
 </details>
 
@@ -37,14 +38,14 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 <details markdown="1">
 <summary>Output files</summary>
 
-- `fastq/<sample>/`
-  - `<sample_id>.R1.fq.gz`, `<sample_id>.R2.fq.gz`: demultiplexed FASTQ files for each `sample_id` listed in the sample's `barcodes` TSV.
-  - `unmatched_R1.fq.gz`, `unmatched_R2.fq.gz`: reads whose cell barcode did not match any `sample_id` in the barcodes file.
+- `fastq/<udi>/`
+  - `<sample_id>.R1.fq.gz`, `<sample_id>.R2.fq.gz`: demultiplexed FASTQ files for each `sample_id` listed in the input CSV.
+  - `unmatched_R1.fq.gz`, `unmatched_R2.fq.gz`: reads whose BRB-seq barcode did not match any `barcode` in the input CSV.
   - `demux-metrics.txt`: per-barcode demultiplexing metrics.
 
 </details>
 
-The pooled reads referenced in the samplesheet contain multiple biological samples multiplexed together via cell barcodes (read structure `14B14M` for read 1, `90T` for read 2). [fqtk](https://github.com/fulcrumgenomics/fqtk) demultiplexes these into per-sample FASTQ files using the `barcodes` TSV supplied for that sample, for QC and archival purposes. STARsolo (below) still aligns and quantifies the original, pooled FASTQ files directly - it is not affected by this step.
+The converted reads contain multiple biological samples multiplexed together via BRB-seq barcodes. [fqtk](https://github.com/fulcrumgenomics/fqtk) demultiplexes these into per-sample FASTQ files using the `sample_id`/`barcode` mappings from the input CSV for QC and archival purposes. STARsolo aligns and quantifies the converted pooled FASTQ files directly.
 
 ### STARsolo
 
@@ -52,12 +53,12 @@ The pooled reads referenced in the samplesheet contain multiple biological sampl
 <summary>Output files</summary>
 
 - `starsolo/`
-  - `<sample>_starsolo.Solo.out/`: per-cell/barcode gene counts and summary statistics, including `Gene/Summary.csv`.
-  - `<sample>_starsolo.Log.final.out`, `<sample>_starsolo.Log.out`, `<sample>_starsolo.Log.progress.out`: STAR alignment logs.
+  - `<udi>.Solo.out/`: per-cell/barcode gene counts and summary statistics, including `Gene/Summary.csv`.
+  - `<udi>.Log.final.out`, `<udi>.Log.out`, `<udi>.Log.progress.out`: STAR alignment logs.
 
 </details>
 
-[STARsolo](https://github.com/alexdobin/STAR) aligns the pooled, multiplexed FASTQ files against the reference genome and quantifies reads per cell barcode/UMI. The barcode whitelist used here is derived from the `barcodes` TSV (with the `sample_id` column stripped, since STARsolo's `--soloCBwhitelist` does not support sample names).
+[STARsolo](https://github.com/alexdobin/STAR) aligns the pooled, multiplexed FASTQ files against the reference genome and quantifies reads per cell barcode/UMI.
 
 ### CONVERTMATRIX
 
@@ -65,11 +66,12 @@ The pooled reads referenced in the samplesheet contain multiple biological sampl
 <summary>Output files</summary>
 
 - `umi_counts/`
-  - `<sample>.tsv`: gene x sample UMI/read count matrix, with columns labelled by `sample_id` (looked up from the `barcodes` TSV) instead of raw cell barcodes.
+  - `<udi>.umi_counts.tsv`: gene x sample UMI count matrix, with columns labelled by `sample_id`.
+  - `<udi>.read_counts.tsv`: gene x sample read count matrix, with columns labelled by `sample_id`.
 
 </details>
 
-CONVERTMATRIX reformats the STARsolo per-barcode count matrix into a gene x sample table, replacing barcode column headers with the corresponding biological sample names.
+CONVERTMATRIX reformats the STARsolo per-barcode count matrices into gene x sample tables, replacing barcode column headers with the corresponding biological sample names.
 
 ### STAR index
 
@@ -105,10 +107,9 @@ Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQ
 <summary>Output files</summary>
 
 - `pipeline_info/`
-  - Reports generated by Nextflow: `execution_report.html`, `execution_timeline.html`, `execution_trace.txt` and `pipeline_dag.dot`/`pipeline_dag.svg`.
-  - Reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameter's are used when running the pipeline.
-  - Reformatted samplesheet files used as input to the pipeline: `samplesheet.valid.csv`.
-  - Parameters used by the pipeline run: `params.json`.
+  - Reports generated by Nextflow: timestamped `execution_report_*.html`, `execution_timeline_*.html`, `execution_trace_*.txt` and `pipeline_dag_*.html`.
+  - Reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and the software versions YAML file. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameters are used.
+  - Parameters used by the pipeline run: a timestamped `params_*.json` file.
 
 </details>
 

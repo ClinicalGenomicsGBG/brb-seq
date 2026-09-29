@@ -29,28 +29,40 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_brb-
 workflow CLINICALGENOMICSGBG_BRB_SEQ {
 
     take:
-    samplesheet // channel: samplesheet read in from --input
+    ch_samplesheet // channel: samplesheet read in from --input
+    val_bclconvert_samplesheet
+    val_fasta
+    val_gtf
+    val_rundir
+    val_star_index
+
+
 
     main:
 
-    ch_fasta = params.fasta
+    ch_fasta = val_fasta
         ? channel.fromPath(params.fasta).map { file -> [ [ id: file.simpleName], file] }.collect()
         : channel.empty()
-    ch_gtf = params.gtf
+    ch_gtf = val_gtf
         ? channel.fromPath(params.gtf).map { file -> [ [ id: file.simpleName], file] }.collect()
         : channel.empty()
-    ch_star_index = params.star_index
+    ch_star_index = val_star_index
         ? channel.fromPath(params.star_index).map { file -> [ [ id: file.simpleName], file] }.collect()
         : channel.empty()
+    ch_rundir = channel.fromPath(val_rundir)
+    ch_bclconvert_samplesheet = channel.fromPath(val_bclconvert_samplesheet)
 
     BRB_SEQ (
-        samplesheet,
+        ch_samplesheet,
+        ch_bclconvert_samplesheet,
         ch_fasta,
         ch_gtf,
+        ch_rundir,
         ch_star_index,
-        params.fasta ? params.fasta.endsWith('.gz') : false,
-        params.gtf ? params.gtf.endsWith('.gz') : false
+        val_fasta ? val_fasta : false,
+        val_gtf ? val_gtf.endsWith('.gz') : false
     )
+
     emit:
     multiqc_report = BRB_SEQ.out.multiqc_report // channel: /path/to/multiqc_report.html
     multiqc        = BRB_SEQ.out.multiqc        // channel: multiqc report + data + plots, for publishing
@@ -87,7 +99,12 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     CLINICALGENOMICSGBG_BRB_SEQ (
-        PIPELINE_INITIALISATION.out.samplesheet
+        PIPELINE_INITIALISATION.out.samplesheet,
+        params.bclconvert_samplesheet,
+        params.fasta,
+        params.gtf,
+        params.rundir,
+        params.star_index
     )
     //
     // SUBWORKFLOW: Run completion tasks
