@@ -27,7 +27,7 @@ The three columns are mandatory and must be provided in this order:
 - `udi`: unique dual index name matching the sample sheet used for the sequencing run
 - `barcode`: BRB-seq barcode for the biological sample
 
-The samplesheet must be a CSV file. The sequencing run directory (or `.tar.gz` archive) is supplied separately with `--rundir`; the BCL Convert sample sheet defaults to `assets/bclconvert/samplesheet_forward.csv`.
+The samplesheet must be a CSV file. The sequencing run directory is supplied separately with `--rundir`; the BCL Convert sample sheet defaults to `assets/bclconvert/samplesheet_forward.csv`.
 
 Run the pipeline with:
 

@@ -50,8 +50,9 @@ workflow BRB_SEQ {
     ch_multiqc_files = ch_multiqc_files.mix(BCLCONVERT.out.reports.map { _meta, file -> file })
 
     ch_demuxed = BCLCONVERT.out.fastq
+        .transpose()
         .map { _meta, fq ->
-            def match = (fq =~ /^(.+)_S\d+/)
+            def match = (fq.baseName =~ /^(.+)_S\d+/)
             def udi = match[0][1]
             tuple([id: udi], fq)
         }
@@ -61,51 +62,49 @@ workflow BRB_SEQ {
         }
 
     ch_whitelist = ch_samplesheet
-        .collectFile(newLine: true) {meta, barcode ->
-            ["${meta.uid}.whitelist.txt", barcode]
+        .collectFile {meta, barcode ->
+            ["${meta.udi}.whitelist.txt", barcode + '\n']
         }
         .map { file ->
-            def udi = file =~ (/^(.+)\.whitelist\.txt/)[0][1]
+            def udi = (file.name =~ /(.+)\.whitelist\.txt/)[0][1]
             tuple([id: udi], file)
-        }
+        }.dump()
 
     ch_fqtk_samplesheet = ch_samplesheet
-        .collectFile(newLine: true) {meta, barcode ->
-            ["${meta.uid}.fqtk.txt", meta.id + "\t" + barcode]
-        }
+        .collectFile({ meta, barcode ->
+            ["${meta.udi}.fqtk.txt", meta.id + "\t" + barcode + '\n']
+        }, seed: "sample_id\tbarcode\n")
         .map { file ->
-            def udi = file =~ (/^(.+)\.fqtk\.txt/)[0][1]
+            def udi = (file.name =~ /(.+)\.fqtk\.txt/)[0][1]
             tuple([id: udi], file)
-        }
+        }.dump()
     
-    ch_demuxed.reads1
+    ch_star_input = ch_demuxed.reads1
         .join( ch_demuxed.reads2 )
         .join( ch_whitelist )
         .multiMap { meta, reads1, reads2, whitelist ->
             star_fq: [meta, "CB_UMI_Simple", [reads1, reads2]]
             star_barcodes: whitelist
         }
-        .set { ch_star_input }
 
-    ch_demuxed.reads1
-        .concat( ch_demuxed.reads2 )
-        .groupTuple()
-        .set { ch_grouped_reads }
+    ch_grouped_reads = ch_demuxed.reads1
+        .join( ch_demuxed.reads2, failOnDuplicate: true, failOnMismatch: true)
+        .map {meta, reads1, reads2 -> tuple(meta, [reads1,reads2].flatten()) }
       
 
-    FASTQC ( ch_grouped_reads )
+    FASTQC ( BCLCONVERT.out.fastq )
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{_meta, file -> file})
 
     //
     // Demultiplex the multiplexed FASTQs with FQTK for QC/archival purposes only.
     // STARsolo further below still consumes the original multiplexed FASTQs.
     //
-    STAGEFASTQDIR ( ch_grouped_reads)
+    STAGEFASTQDIR ( ch_grouped_reads )
 
     ch_fqtk_samplesheet
-        .join( STAGEFASTQDIR.out.dir )
-        .join( ch_demuxed.reads1 )
-        .join( ch_demuxed.reads2 )
+        .join( STAGEFASTQDIR.out.dir, failOnDuplicate: true, failOnMismatch: true)
+        .join( ch_demuxed.reads1, failOnDuplicate: true, failOnMismatch: true)
+        .join( ch_demuxed.reads2, failOnDuplicate: true, failOnMismatch: true)
         .map { meta, samplesheet, fastq_dir, reads1, reads2 ->
             def read_structure_pairs = [[reads1.name, '14B14T'], [reads2.name, '90T']]
             [meta, samplesheet, fastq_dir, read_structure_pairs]

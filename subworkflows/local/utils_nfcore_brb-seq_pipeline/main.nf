@@ -86,17 +86,6 @@ workflow PIPELINE_INITIALISATION {
 
     channel
         .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
-        .map { meta, reads1, reads2, barcodes -> [
-            meta + [single_end: false],
-            file(reads1, checkIfExistis: true),
-            file(reads2, checkIfExistis: true),
-            file(barcodes, checkIfExistis: true)
-        ]}
-        .groupTuple()
-        .map {
-            meta, reads1, reads2, barcodes ->
-                return [ meta, reads1.flatten(), reads2.flatten(), barcodes.flatten() ]
-        }
         .set { ch_samplesheet }
 
     emit:
