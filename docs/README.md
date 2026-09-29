@@ -1,5 +1,7 @@
 # ClinicalGenomicsGBG/brb-seq: Documentation
 
+![ClinicalGenomicsGBG/brb-seq metro map](images/brb-seq_metro_map.svg)
+
 The ClinicalGenomicsGBG/brb-seq documentation is split into the following pages:
 
 - [Usage](usage.md)

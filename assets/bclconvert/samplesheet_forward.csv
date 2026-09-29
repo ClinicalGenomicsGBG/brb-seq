@@ -1,0 +1,13 @@
+[Header]
+FileFormatVersion,2
+IndexOrientation,Forward
+
+[BCLConvert_Settings]
+NoLaneSplitting,true
+
+[BCLConvert_Data]
+Sample_ID,index,index2,Sample_Project
+MQ-UDI-1,TAAGGCGA,TATAGCCT,
+MQ-UDI-2,CGTACTAG,ATAGAGGC,
+MQ-UDI-3,AGGCAGAA,CCTATCCT,
+MQ-UDI-4,GCGTTGGA,TTGGACTT,
